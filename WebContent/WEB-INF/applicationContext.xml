@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+	http://www.springframework.org/schema/aop 
+	http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context-4.0.xsd"
+	default-lazy-init="false">
+	<!-- 导入属性配置文件 -->
+	<context:property-placeholder
+		ignore-resource-not-found="true" location="/WEB-INF/jdbc.properties"
+		order="1" ignore-unresolvable="true" />
+	<!-- 导入属性配置文件 -->
+
+	<import resource="applicationContext-MVC.xml" />
+	<import resource="mybatis.xml" />
+	<!-- 支持注解 -->
+	<context:annotation-config />
+	<context:component-scan base-package="com" />
+
+	<!-- 拦截器方式配置事物 -->
+	<tx:advice id="transactionAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="add*" propagation="REQUIRED" />
+			<tx:method name="append*" propagation="REQUIRED" />
+			<tx:method name="insert*" propagation="REQUIRED" />
+			<tx:method name="save*" propagation="REQUIRED" />
+			<tx:method name="update*" propagation="REQUIRED" />
+			<tx:method name="modify*" propagation="REQUIRED" />
+			<tx:method name="edit*" propagation="REQUIRED" />
+			<tx:method name="delete*" propagation="REQUIRED" />
+			<tx:method name="remove*" propagation="REQUIRED" />
+			<tx:method name="repair" propagation="REQUIRED" />
+			<tx:method name="delAndRepair" propagation="REQUIRED" />
+
+			<tx:method name="get*" propagation="SUPPORTS" />
+			<tx:method name="find*" propagation="SUPPORTS" />
+			<tx:method name="load*" propagation="SUPPORTS" />
+			<tx:method name="search*" propagation="SUPPORTS" />
+			<tx:method name="datagrid*" propagation="SUPPORTS" />
+
+			<tx:method name="*" propagation="SUPPORTS" />
+		</tx:attributes>
+	</tx:advice>
+	<aop:config>
+		<aop:pointcut id="_service"
+			expression="(
+	               			execution(* com.lanhun.framework.service.*.*(..))
+	                )" />
+
+		<aop:pointcut id="_controller"
+			expression="(
+	               			execution(* com.lanhun.framework.controller.*.*(..))
+	               		and !execution(* com.lanhun.framework.controller.vo.*.*(..))
+	               		or execution(* com.lanhun.framework.controller.demo.*.*(..))	
+	                )" />
+
+		<aop:advisor advice-ref="transactionAdvice" pointcut-ref="_service"
+			order="3" />
+
+		<!--日志拦截 -->
+		<aop:aspect ref="logInterceptor" order="2">
+			<!--配置com.spring.service包下所有类或接口的所有方法 -->
+
+			<aop:around pointcut-ref="_service" method="logAround" />
+			<aop:around pointcut-ref="_controller" method="logAround" />
+
+		</aop:aspect>
+		
+		<!-- 异常拦截 -->
+		<aop:aspect ref="exceptionInterceptor" order="1">
+			<!--配置com.spring.service包下所有类或接口的所有方法 -->
+			<aop:after-throwing pointcut-ref="_controller" method="doThrowing" throwing="ex" />
+			<aop:after-throwing pointcut-ref="_service" method="doThrowing" throwing="ex" />
+		</aop:aspect>
+	</aop:config>
+
+	<bean id="exceptionResolver" class="com.lanhun.framework.utils.HandlerExceptionResolver" />
+</beans>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lanhun.framework.orm.mapper.UserMapper">
+  <resultMap id="BaseResultMap" type="com.lanhun.framework.orm.model.User">
+    <!--
+      WARNING - @mbggenerated
+    -->
+    <id column="f_id" jdbcType="VARCHAR" property="id" />
+    <result column="f_number" jdbcType="VARCHAR" property="number" />
+    <result column="f_name" jdbcType="VARCHAR" property="name" />
+    <result column="f_create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="f_last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
+    <result column="f_creator" jdbcType="VARCHAR" property="creator" />
+    <result column="f_last_modifier" jdbcType="VARCHAR" property="lastModifier" />
+  </resultMap>
+</mapper>
